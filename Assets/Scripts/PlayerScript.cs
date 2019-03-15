@@ -9,9 +9,10 @@ public class PlayerScript : MonoBehaviour
     private float movementSpeed; //Hareket hızı için değişken yaptık
 
     private bool isAttack;
+    private bool isSlide;
 
     private Rigidbody2D myRigidBody2D; //Kodun bağlı olduğu objenin RigidBody'sine değişken yaptık
-    //Yeni
+ 
     private Animator myAnimator; //Kodun bağlı olduğu objenin Animator'una değişken yaptık
 
 
@@ -48,8 +49,14 @@ public class PlayerScript : MonoBehaviour
         if (!this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
             myRigidBody2D.velocity = new Vector2(horizontal * movementSpeed, myRigidBody2D.velocity.y);
         }
-
-        
+        //Kayma hareketi başla
+        if (isSlide && !this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Slide")) {
+            myAnimator.SetBool("slide", true);
+        }
+        else if (!this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Slide")) {
+            myAnimator.SetBool("slide", false);
+        }
+        //Kayma hareketi bitiş
         myAnimator.SetFloat("speed", Mathf.Abs(horizontal));
     }
 
@@ -65,10 +72,14 @@ public class PlayerScript : MonoBehaviour
         {
             isAttack = true;
         }
+        if (Input.GetKeyDown(KeyCode.C)) {
+            isSlide = true;
+        }
     }
 
     private void ResetValues() {
         isAttack = false;
+        isSlide = false;
     }
 
     private void Flip(float horizontal)
