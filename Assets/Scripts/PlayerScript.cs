@@ -5,6 +5,18 @@ using UnityEngine;
 public class PlayerScript : MonoBehaviour
 {
 
+
+    [SerializeField]
+    private Transform[] groundPoints;
+
+    [SerializeField]
+    private float pointRadius;
+
+    [SerializeField]
+    private LayerMask whatIsGround;
+
+    private bool isGround;
+
     [SerializeField]
     private float movementSpeed; //Hareket hızı için değişken yaptık
 
@@ -36,6 +48,10 @@ public class PlayerScript : MonoBehaviour
     {
 
         float horizontal = Input.GetAxis("Horizontal");  //Horizontal sistemi için değişken yaptık.horizontal değişkeni a,d ve yön tuşlarına göre -1 vey 1 değeri alacak.
+
+        isGround = isGrounded();
+        Debug.Log(isGround);
+
 
         HandleMovement(horizontal);
         Flip(horizontal);
@@ -93,6 +109,26 @@ public class PlayerScript : MonoBehaviour
             theScale.x *= -1;
             transform.localScale = theScale;
         }
+    }
+
+    private bool isGrounded()
+    {
+        if (myRigidBody2D.velocity.y <= 0)
+        {
+            foreach (Transform point in groundPoints)
+            {
+                Collider2D[] colliders = Physics2D.OverlapCircleAll(point.position,pointRadius, whatIsGround);
+
+                for (int i = 0; i < colliders.Length; i++)
+                {
+                    if (colliders[i].gameObject != this.gameObject)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
 }
