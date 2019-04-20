@@ -16,9 +16,15 @@ public class PlayerScript : MonoBehaviour
     private LayerMask whatIsGround;
 
     private bool isGround;
+    private bool jump;
+  
 
     [SerializeField]
     private float movementSpeed; //Hareket hızı için değişken yaptık
+
+    [SerializeField]
+    private float jumpForce;
+
 
     private bool isAttack;
     private bool isSlide;
@@ -50,9 +56,7 @@ public class PlayerScript : MonoBehaviour
         float horizontal = Input.GetAxis("Horizontal");  //Horizontal sistemi için değişken yaptık.horizontal değişkeni a,d ve yön tuşlarına göre -1 vey 1 değeri alacak.
 
         isGround = isGrounded();
-        Debug.Log(isGround);
-
-
+      
         HandleMovement(horizontal);
         Flip(horizontal);
         HandleAttack();
@@ -65,6 +69,15 @@ public class PlayerScript : MonoBehaviour
         if (!this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
             myRigidBody2D.velocity = new Vector2(horizontal * movementSpeed, myRigidBody2D.velocity.y);
         }
+
+        //Zıplama hareketi
+        if (isGround && jump)
+        {
+            isGround = false;
+            myRigidBody2D.AddForce(new Vector2(0, jumpForce));
+        }
+    
+
         //Kayma hareketi başla
         if (isSlide && !this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Slide")) {
             myAnimator.SetBool("slide", true);
@@ -91,11 +104,16 @@ public class PlayerScript : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.C)) {
             isSlide = true;
         }
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            jump = true;
+        }
     }
 
     private void ResetValues() {
         isAttack = false;
         isSlide = false;
+        jump = false;
     }
 
     private void Flip(float horizontal)
@@ -111,6 +129,7 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
+    //Karakter yerde mi değil mi?
     private bool isGrounded()
     {
         if (myRigidBody2D.velocity.y <= 0)
