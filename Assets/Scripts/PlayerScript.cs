@@ -60,12 +60,17 @@ public class PlayerScript : MonoBehaviour
         HandleMovement(horizontal);
         Flip(horizontal);
         HandleAttack();
+        HandleLayers();
         ResetValues();
     }
 
 
     private void HandleMovement(float horizontal)
     {
+
+        if (myRigidBody2D.velocity.y < 0) {
+            myAnimator.SetBool("land",true);
+        }
         if (!this.myAnimator.GetCurrentAnimatorStateInfo(0).IsTag("Attack")) {
             myRigidBody2D.velocity = new Vector2(horizontal * movementSpeed, myRigidBody2D.velocity.y);
         }
@@ -75,6 +80,7 @@ public class PlayerScript : MonoBehaviour
         {
             isGround = false;
             myRigidBody2D.AddForce(new Vector2(0, jumpForce));
+            myAnimator.SetTrigger("jump");
         }
     
 
@@ -142,12 +148,25 @@ public class PlayerScript : MonoBehaviour
                 {
                     if (colliders[i].gameObject != this.gameObject)
                     {
+                        myAnimator.ResetTrigger("jump");
+                        myAnimator.SetBool("land", false);
                         return true;
                     }
                 }
             }
         }
         return false;
+    }
+
+    private void HandleLayers()
+    {
+        if (!isGround)
+        {
+            myAnimator.SetLayerWeight(1, 1);
+        }
+        else {
+            myAnimator.SetLayerWeight(1,0);
+        }
     }
 
 }
